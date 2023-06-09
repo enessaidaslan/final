@@ -1,0 +1,534 @@
+---
+title: "Çevresel Sürdürülebilirliği Etkileyen Faktörlerin Makine Öğrenimi Modeli İle Analizi"
+author: 
+  - Enes Said Aslan[21080394]
+bibliography: ../bibliography/biblio.bib
+csl: ../csl/apa-tr.csl
+header-includes:
+  - \usepackage{polyglossia}
+  - \setmainlanguage{turkish}
+  - \usepackage{booktabs}
+  - \usepackage{caption} 
+  - \captionsetup[table]{skip=10pt}
+output:
+  bookdown::pdf_document2:
+    fig_caption: yes
+    fig_height: 3
+    fig_width: 4
+    keep_tex: no
+    latex_engine: xelatex
+    number_sections: yes
+    toc: no
+geometry: margin=1in
+link-citations: yes
+urlcolor: blue
+fontsize: 12pt
+biblio-style: apalike
+abstract: |
+  Bu veri analizi, çevresel sürdürülebilirlik üzerine çeşitli faktörleri inceledi. Analiz sonuçlarına göre, karasal korunan alanlar ile kırmızı liste indeksi arasında zayıf bir pozitif ilişki, yenilenebilir enerji tüketimi ile tatlı su çekimi arasında ise pozitif bir ilişki gözlendi. Ancak, fosfor ve azot değişkenleri arasında belirgin bir ilişki tespit edilemedi. Bu detaylı analiz ve geliştirmelerle, çevresel sürdürülebilirlik konusunda daha kapsamlı bir bilgiye ulaşılabilir ve doğru stratejilerin belirlenmesi için daha güçlü bir temel oluşturulabilir. Bu sayede, kaynakların daha etkili ve verimli kullanılması, doğal çevrenin korunması ve gelecek nesillere daha sürdürülebilir bir dünya bırakılması hedeflenebilir. 
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = FALSE, echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+<!-- ======================================================================= -->
+<!-- ============================== NOTLAR ================================= -->
+<!-- ======================================================================= -->
+[Github Repo](https://github.com/KULLANICI_ADINIZ/REPO_ADINIZ)
+
+# Giriş
+Dünya şu anda doğal kaynakların hızla tükendiği ve tükenen kaynakların telafisinin çok güçleştiği bir durumdadır. İnsan ve diğer canlıların yaşamını tehlikeye sokan bu durum, insanları çözüm önerileri getirmeye yöneltmiştir. Bu bağlamda ‘çevresel sürdürülebilirlik’ anlayışı yaygınlaştırılmaya çalışılmaktadır. Çevresel sürdürülebilirlik doğal kaynakların yerinde kullanılarak gelecek kuşaklara aktarılması ve devamlılığının sağlanmasıdır. Bu veri seti, çevresel sürdürülebiliriği etkileyen faktörlerden oluşan 14 değişken içerir. Bu değişkenlere ait 2020 yılından 53 farklı gözlem bulunmaktadır. Bu veri setinde aşağıdaki değişkenler bulunmaktadır;
+
+*  **Kömür tüketimi: Toplam nihai enerji tüketiminin yüzdesi olarak kömür tüketimi.** 
+*  **Kişi başına karbondioksit tüketim emisyonları: İnsan faaliyetlerinin bir sonucu olarak üretilen toplam karbondioksit emisyonları..**
+*  **Birim GSYİH başına karbondioksit emisyonları: Fosil yakıtların yakılması, gaz yakma ve çimento üretiminden kaynaklanan insan kaynaklı karbondioksit emisyonları, 2020 satın alma gücü paritesinde (SAGP) birim gayri safi yurtiçi hasıla (GSYİH) başına kilogram olarak ifade edilmiştir.**
+* **Yenilenebilir enerji tüketimi: Toplam nihai enerji tüketiminde yenilenebilir enerjinin payı. Hidroelektrik, jeotermal, güneş, rüzgar, biyokütle, biyoyakıtları gibi.**
+* **Solar fotovoltaik elektrik kapasitesi: Güneş fotovoltaikleri tarafından sağlanabilen, megavat cinsinden ifade edilen toplam elektrik kapasitesi.**
+* **Tatlı su çekimi: Toplam yenilenebilir su kaynaklarının yüzdesi olarak ifade edilen, çekilen toplam tatlı su.**
+* **Gübre besinlerinin kullanımı: Gübre besin maddelerinin toplam tarımsal kullanımı — azot (N) veya fosfor (P2O5 olarak ifade edilir), ekim alanı başına ifade edilir.**
+* **Kişi başına yerli malzeme tüketimi: Doğrudan malzeme ithalatı ve yurt içinde çıkarılan malzemelerin toplamı eksi doğrudan malzeme ihracatının toplamı.**
+* **Afetlere atfedilen ölüm ve kayıp kişilerin sayısı**
+* **Karasal korunan alanlar**
+* **Kırmızı Liste İndeksi: Tür grupları genelinde toplu yok olma riskinin ölçüsü. Uluslararası Doğayı Koruma Birliği Kırmızı Tehdit Altındaki Türler Listesi'ndeki her bir yok olma riski kategorisindeki tür sayısındaki gerçek değişikliklere dayanmaktadır. Nesli tükenmiş olarak sınıflandırılan tüm türler için 0 ile en az endişe verici olarak sınıflandırılan tüm türler için 1 arasında değişir.**
+
+## Çalışmanın Amacı
+Çevresel sürdürülebilirlik eldeki kaynakların en verimli şekilde kullanılması ve doğal kaynakların kendisini yenileyebilmesi için gerekli özverinin sağlanmasını hedefler. Bu çalışmada gelişmiş, gelişmekte olan ve gelişmemiş ülkelere göre sürdürülebilirliği etkileyen faktörler üzerinden analiz yapcağız. Dünyanın geleceği için, bir makine öğrenimi modelinin çok yardımcı olabileceği erken tespit ve yönetimden yararlanacağız.
+
+## Literatür 
+Sürdürülebilirlik kavramı çevre sorunlarının ortaya çıkması ile bu sorunların çözüme ulaştırılması amacıyla ortaya çıkmıştır. Bunun sonucunda da ulusal ve uluslararası ölçekte sürdürülebilir kalkınma benimsenmiştir. [@langston2008sustainable] Günümüzde sürdürülebilir kalkınma çevre koruma politikasının hem ulusal hem de uluslar arası ölçekte kabul görmüş ana kavramıdır diyebilmekteyiz. [@gedik2020sosyal] Bu kavram çevreye hasar vermeden ekonomik gelişmeyi hedefleyen bir süreç olarak tanımlanabilmektedir. Bu kavramın temelinde ekonomik büyümeyi doğanın taşıma kapasitesini aşmadan gerçekleştirme düşüncesi yatmaktadır. Bu kavram ekonomik gelişme ve büyüme ile meydana gelen çevre problemlerini hedef almaktadır. 
+Çevre problemlerinin giderek artması ve gün yüzüne çıkması, ekolojik dengenin bozunuma uğraması ve buna paralel sağlık sorunlarının artması, kalkınma yanında çevrenin de önemli olduğu sürdürülebilirlik ilkesini ortaya çıkarmış ve dünyanın sürekliliğinin ekosistemdeki her türlü canlının güvenliğini sağlamakla, kalkınma ve ekonomi arasındaki barış ve dengenin sağlanmasına borçlu olduğu görüşünü getirmiştir. [@karalar2011ccevresel] 
+Çevresel sürdürülebilirlik, doğal kaynakların sürekliliğinin sağlanması anlamına gelmektedir. Çevrenin sürdürülebilir kullanımı açısından yenilenebilir ve yenilenemeyen kaynakların kullanımı, kirlilik, atık asimilasyonu gibi faaliyetlerde çevresel sürdürebilirlik kavramı bir dizi kısıtlamalar getirmektedir. Kısıtlamalar doğal çevrenin sürdürülmesi amacını gütmektedir. [@kumar2015effective]
+İnsanoğlunun çevre ve kaynakları üzerindeki en önemli etkisi sürdürülebilir kullanım üzerinedir. Sürdürülebilirlik, çevre tahribatının sorun olarak algılanması sonucunda ortaya çıkan kavramdır ve bu sorunların çözüme kavuşturulması amacını taşımaktadır. Sürdürülebilirliğin ana koşulunu ise insan ve doğanın birbirinin karşıtı değil birbirinin tamamlayıcısı olduğu fikri teşkil etmektedir. Sürdürülebilirliğin özellikle üç boyutta etkisi çok büyüktür; ekonomik, sosyal ve çevresel boyut. Sürdürülebilir bir çevreye ulaşabilirsek; sürdürülebilir bir ekonomiye, sosyal yaşama da ulaşabilir, kalkınabiliriz. [@mentecse2017ccevresel]
+
+## Veri 
+
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(here)
+cevre <- readxl::read_xlsx(here("../data/cevre.xlsx"))
+```
+
+```{r, echo=FALSE}
+library(xtable) 
+# devtools::install_github("emraher/summarytools")
+library(summarytools)
+st_options(lang = "tr")
+```
+
+
+```{r, echo=FALSE}
+cevre$Kömür <- as.numeric(cevre$Kömür)
+cevre$`Kişi Başına Karbondioksit` <- as.numeric(cevre$`Kişi Başına Karbondioksit`)
+cevre$`Birim GSYİH` <- as.numeric(cevre$`Birim GSYİH`)
+cevre$`Yenilenebilir Enerji` <- as.numeric(cevre$`Yenilenebilir Enerji`)
+cevre$`Solar Fotovoltaik` <- as.numeric(cevre$`Solar Fotovoltaik`)
+cevre$`Tatlı Su Çekimleri` <- as.numeric(cevre$`Tatlı Su Çekimleri`)
+cevre$Azot <- as.numeric(cevre$Azot)
+cevre$Fosfor <- as.numeric(cevre$Fosfor)
+cevre$`Kişi Başı Yerli Malzeme Ton` <- as.numeric(cevre$`Kişi Başı Yerli Malzeme Ton`)
+cevre$`Kişi Başı Yerli Malzeme` <- as.numeric(cevre$`Kişi Başı Yerli Malzeme`)
+cevre$`Afetlere Atfedilen Ölüm` <- as.numeric(cevre$`Afetlere Atfedilen Ölüm`)
+cevre$`Karasal Korunan Alanlar` <- as.numeric(cevre$`Karasal Korunan Alanlar`)
+cevre$`Kırmızı Liste İndeksi` <- as.numeric(cevre$`Kırmızı Liste İndeksi`)
+str(cevre)
+```
+
+
+```{r, echo=FALSE}
+cevre <- cevre %>% 
+  janitor::clean_names()
+
+names(cevre)
+```
+
+```{r, echo=FALSE}
+complete.cases(cevre)
+na.omit(cevre)
+```
+
+```{r results='asis', echo=FALSE}
+cevre%>%
+  select("komur", "kisi_basina_karbondioksit", "birim_gsyih", "yenilenebilir_enerji", "solar_fotovoltaik", "tatli_su_cekimleri", "azot", "fosfor", "kisi_basi_yerli_malzeme_ton", "afetlere_atfedilen_olum", "karasal_korunan_alanlar", "kirmizi_liste_indeksi", "kisi_basi_yerli_malzeme") %>% 
+  descr(stats = c("mean", "sd", "min", "med", "max"), transpose = TRUE) %>% 
+  xtable(caption = "Özet İstatistikler",
+         label = "tab:ozet",
+         align = c("l", "c", "c", "c", "c", "c")) %>% 
+  print(booktabs = TRUE, comment = FALSE, caption.placement = "top")
+```
+
+Veri setinde yer alan değişkenlerin özet istatistiklerine göre, çevre ile ilgili farklı ölçümler ve göstergeler bulunmaktadır. Örneğin, "Afetlere Atfedilen Ölüm " değişkenine bakıldığında, ortalaması 12.95 ve standart sapması 41.54 olarak hesaplanmıştır. Bu değişken, afetlere atfedilen ölüm sayısının 100.000 nüfus başına düşen değerlerini temsil etmektedir. Benzer şekilde, "azot" ve "fosfor" değişkenleri ise hektar başına düşen azot ve fosfor miktarlarını ifade etmektedir.
+
+Diğer bir önemli değişken olan "solar fotovoltaik", güneş enerjisinden elektrik üretim kapasitesini temsil etmektedir. Ortalama değeri 13098.69 ve standart sapması 45335.43 olarak hesaplanmıştır, bu da güneş enerjisinin elektrik üretimindeki büyük farklılıkları yansıtmaktadır.
+
+Veri setindeki değişkenlerin özet istatistikleri incelendiğinde, çevre ile ilgili farklı alanlardaki ölçümler ve göstergelerin geniş bir dağılıma sahip olduğu görülmektedir. Bu bilgiler, çevresel faktörlerin çeşitliliğini ve farklı bölgeler arasındaki çevresel farklılıkları yansıtmaktadır. Daha detaylı analizler yaparak, değişkenler arasındaki ilişkileri ve çevresel etkileri daha iyi anlayabiliriz.
+
+
+## Yöntem ve Veri Analizi
+Çalışmanın amacı, çevresel sürdürülebilirliği etkileyen faktörler üzerinden gelişmiş, gelişmekte olan ve gelişmemiş ülkeler arasındaki farkları incelemektir. Bu bağlamda, aşağıdaki soruları sormak ve cevaplamak önemlidir:
+
+* Gelişmiş, gelişmekte olan ve gelişmemiş ülkeler arasında kömür tüketimi, karbondioksit emisyonları, yenilenebilir enerji tüketimi gibi faktörlerde nasıl farklılıklar vardır?
+* Gelişmiş ülkelerde güneş enerjisi kapasitesi ve tatlı su çekimi gibi çevresel göstergeler nasıl performans göstermektedir?
+* Gelişmekte olan ülkelerdeki doğal kaynak kullanımı ve korunan alanlar, sürdürülebilirlik açısından nasıl bir görünüm sunmaktadır?
+* Kırmızı Liste İndeksi'ne dayalı olarak, farklı ülkelerdeki türlerin yok olma riski nasıl farklılık göstermektedir?
+* İncelenen faktörler arasında hangileri daha yüksek çevresel sürdürülebilirlikle ilişkilidir ve bu faktörlerin gelecekteki gelişimi nasıl etkileyebilir?
+
+Bu soruların cevaplanması, çevresel sürdürülebilirliğin farklı bölgelerdeki durumunu anlamak ve gelecekteki sürdürülebilirlik politikalarının geliştirilmesine katkıda bulunmak için önemlidir.
+
+$$
+Y_t = \beta_0 + \beta_N N_t + \beta_P P_t + \beta_I I_t + \varepsilon_t
+$$
+
+```{r, echo=FALSE}
+
+library(ggplot2)
+ggplot(cevre, aes(x = komur, y = kisi_basina_karbondioksit, color = yenilenebilir_enerji)) +
+  geom_point(na.rm = TRUE, shape = 2, size = 4) +
+  labs(x = "Kömür ", y = "Kişi Başına Karbondioksit ", color = "Yenilenebilir Enerji ") +
+  scale_color_gradient(low = "blue", high = "red") +
+  theme_minimal()
+```
+
+Grafiği incelediğimizde, kömür ve kisi başına karbondioksit arasında genel bir pozitif ilişki olduğu görülüyor. Yani, kömür tüketimi arttıkça kişi başına düşen karbondioksit tüketimi de artmaktadır. Ayrıca, yenilenebilir enerji değişkeni, noktaların renklendirilmesinde kullanılarak, yenilenebilir enerji tüketiminin düzeyine bağlı olarak farklı renk tonları gösterilmektedir.
+
+Bu grafik, kömür tüketimi, kişi başına karbondioksit tüketimi ve yenilenebilir enerji tüketimi arasındaki ilişkiyi görselleştirerek, çevresel sürdürülebilirlik konusunda farkındalık yaratmamıza yardımcı olur.
+
+```{r, echo=FALSE}
+ggplot(data = cevre, aes(x = kisi_basina_karbondioksit)) +
+  geom_density(fill = "dodgerblue", alpha = 0.5) +
+  labs(title = "Kişi Başına Karbondioksit  Yoğunluğu") +
+  theme_minimal()
+```
+
+Grafiği incelediğimizde, kişi başına karbondioksit değişkeninin değerlerinin yoğunluklarının en yüksek olduğu bölgelerin grafiğin ortasında yer aldığını görüyoruz. Bu, kişi başına karbondioksit tüketiminin orta düzeyde olduğunu göstermektedir.
+
+Grafiğin sağa doğru kuyruğu incelendiğinde, daha yüksek kişi başına karbondioksit tüketimi değerlerine sahip olan gözlemlerin daha az olduğu görülmektedir. Bu da, genel olarak düşük ve orta karbondioksit tüketimine sahip olduğumuzu, ancak bazı gözlemlerde daha yüksek tüketimlerin olduğunu göstermektedir.
+
+* Ho (Null Hypothesis): kisi_basi_yerli_malzeme ve kisi_basi_yerli_malzeme_ton değişkenlerinin kırmızı liste indeksi üzerinde etkisi yoktur.
+* Ha (Alternative Hypothesis): kisi_basi_yerli_malzeme ve kisi_basi_yerli_malzeme_ton değişkenlerinin kırmızı liste indeksi üzerinde etkisi vardır.
+
+
+```{r, echo=FALSE}
+library(stats)
+
+bağımlı_değişken <- cevre$kirmizi_liste_indeksi
+bağımsız_değişkenler <- cevre[, c("kisi_basi_yerli_malzeme", "kisi_basi_yerli_malzeme_ton")]
+
+anova_result <- aov(bağımlı_değişken ~ kisi_basi_yerli_malzeme + kisi_basi_yerli_malzeme_ton, data = bağımsız_değişkenler)
+
+summary(anova_result)
+
+```
+
+Bu hipotezlerin temelinde, kisi_basi_yerli_malzeme ve kisi_basi_yerli_malzeme_ton değişkenlerinin kırmızı liste indeksi üzerinde anlamlı bir ilişkiye sahip olup olmadığını test etmek yatmaktadır. Hipotez testi sonuçlarına göre, elde edilen p-değerlerine dayanarak Ho hipotezi reddedilemez ve kisi_basi_yerli_malzeme ve kisi_basi_yerli_malzeme_ton değişkenlerinin kırmızı liste indeksi üzerinde anlamlı bir etkisi olmadığı sonucuna varılmıştır.
+
+Bu durumda, analiz sonuçlarına dayanarak Ho hipotezi kabul edilir ve kisi basi yerli malzeme ve kisi basi yerli malzeme ton değişkenlerinin kırmızı liste indeksi üzerinde etkisinin olmadığı sonucu desteklenmiştir.
+
+* Ho (Null Hypothesis): tatli_su_cekimleri ve yenilenebilir_enerji değişkenlerinin birim_gsyih üzerinde etkisi yoktur.
+* Ha (Alternative Hypothesis): tatli_su_cekimleri ve yenilenebilir_enerji değişkenlerinin birim_gsyih üzerinde etkisi vardır.
+
+```{r, echo=FALSE}
+library(stats)
+
+
+bağımlı_değişken <- cevre$birim_gsyih
+bağımsız_değişkenler <- cevre[, c("tatli_su_cekimleri", "yenilenebilir_enerji")]
+
+
+anova_result <- aov(bağımlı_değişken ~ tatli_su_cekimleri + yenilenebilir_enerji, data = bağımsız_değişkenler)
+
+
+summary(anova_result)
+
+```
+
+Bu hipotezlerin temelinde, tatli su cekimleri ve yenilenebilir enerji değişkenlerinin birim gsyih üzerinde anlamlı bir ilişkiye sahip olup olmadığını test etmektedir. Hipotez testi sonuçlarına göre, elde edilen p-değerine dayanarak yenilenebilir_enerji değişkeninin birim_gsyih üzerinde anlamlı bir etkiye sahip olduğu görülmektedir (p < 0.05). Ancak, tatli su cekimleri değişkeninin birim gsyih üzerinde anlamlı bir etkisi olmadığı sonucuna varılmıştır (p > 0.05).
+
+Bu durumda, analiz sonuçlarına dayanarak Ho hipotezi reddedilemez ve tatli su cekimleri değişkeninin birim_gsyih üzerinde etkisi olmadığı, ancak yenilenebilir enerji değişkeninin birim gsyih üzerinde anlamlı bir etkiye sahip olduğu sonucuna varılmıştır.
+
+```{r, echo=FALSE}
+library(ggplot2)
+
+ggplot(cevre, aes(x = yenilenebilir_enerji, y = tatli_su_cekimleri)) +
+  geom_point() +
+  xlab("Yenilenebilir Enerji") +
+  ylab("Tatlı Su Çekimleri ") +
+  ggtitle("Yenilenebilir Enerj ile 
+    Tatlı Su Çekimleri  İlişkisi")
+
+```
+
+Bu grafiğe göre, yenilenebilir enerji ve tatlı su çekimleri arasında bir ilişki olduğu görülmektedir. Yenilenebilir enerji arttıkça tatlı su çekimleri de artma eğilimindedir. Ancak, ilişkinin doğrusal bir şekilde artan veya azalan bir eğilim sergilemediği, daha karmaşık bir ilişki olduğu gözlemlenebilir. Yüksek yenilenebilir enerji değerlerine sahip olan noktalar genellikle daha yüksek tatlı su çekimlerine sahipken, düşük yenilenebilir enerji değerlerine sahip noktaların genellikle daha düşük tatlı su çekimleri olduğu görülmektedir.
+
+Bu grafik, yenilenebilir enerji ve tatlı su çekimleri arasındaki ilişkiyi görsel olarak göstermektedir. Ancak, doğrusal bir trend veya kesin bir ilişkiyi belirlemek için daha fazla analiz yapılması gerekmektedir.
+
+```{r, echo=FALSE}
+
+ggplot(cevre, aes(x = kisi_basi_yerli_malzeme, y = kisi_basi_yerli_malzeme_ton)) +
+  geom_point() +
+  labs(x = "Kişi Başı Yerli Malzeme Ton", y = "Kişi Başı Yerli Malzeme )") +
+  ggtitle("Kişi Başı Yerli Malzeme Ton ile 
+    Kişi Başı Yerli Malzeme  Arasındaki 
+    İlişki") +
+  theme_minimal()
+```
+
+Bu grafik, kişi başına düşen yerli malzeme tonajı ile kişi başına düşen yerli malzeme arasındaki ilişkiyi göstermektedir. Grafikte, x-ekseninde kişi başına yerli malzeme tonajı, y-ekseninde ise kişi başına yerli malzeme değeri yer almaktadır.
+
+Grafikte, genel olarak kişi başına yerli malzeme tonajı ile kişi başına yerli malzeme değeri arasında pozitif bir ilişki olduğu görülmektedir. Yani, kişi başına düşen yerli malzeme tonajı arttıkça kişi başına düşen yerli malzeme miktarı da artmaktadır. Ancak, ilişki doğrusal bir şekilde artan veya azalan bir eğilim göstermekten ziyade daha karmaşık bir yapıya sahip gibi görünmektedir.
+
+Bu grafik, kişi başına yerli malzeme tonajı ile kişi başına yerli malzeme arasındaki ilişkiyi görsel olarak göstermektedir.
+
+```{r, echo=FALSE}
+ggplot(cevre, aes(x = fosfor, y = azot)) +
+  geom_point() +
+  labs(x = "fosfor", y = "azot") +
+  ggtitle("fosfor ile azot Arasındaki İlişki") +
+  theme_minimal()
+
+```
+
+Bu grafik, fosfor ve azot arasındaki ilişkiyi göstermektedir. Grafikte, x-ekseninde fosfor değerleri, y-ekseninde ise azot değerleri yer almaktadır.
+
+Görsel olarak, grafikte bir pozitif ilişki gözlenmektedir. Yani, fosfor değeri arttıkça azot değeri de genellikle artmaktadır. Ancak, bu ilişki doğrusal bir şekilde artan veya azalan bir eğilim göstermekten ziyade daha karmaşık bir yapıya sahip gibi görünmektedir.
+
+```{r, echo=FALSE}
+
+library(dplyr)
+
+cy <- cevre %>%
+  select(karasal_korunan_alanlar, kirmizi_liste_indeksi)
+
+
+correlation <- cor(cy$karasal_korunan_alanlar, cy$kirmizi_liste_indeksi
+, method = "pearson")
+
+print(correlation)
+
+```
+
+Bu korelasyon analizi sonucunda, karasal korunan alanlar ile kırmızı liste indeksi arasında zayıf bir pozitif korelasyon olduğu görülmektedir. Korelasyon katsayısı olan 0.0758, bu iki değişken arasındaki ilişkinin düşük seviyede olduğunu göstermektedir.
+
+Bu sonuçlara dayanarak, karasal korunan alanların artmasıyla kırmızı liste indeksinin de arttığı söylenemez. Ancak, bu iki değişken arasında hafif bir ilişki bulunabileceği ve karasal korunan alanların artışının kırmızı liste indeksi üzerinde olumlu bir etkisi olabileceği düşünülebilir.
+
+```{r, echo=FALSE}
+
+en_yuksek_puan_ulke <- cevre %>%
+  arrange(desc(kirmizi_liste_indeksi)) %>%
+  select(ulke, kirmizi_liste_indeksi) %>%
+  slice(1:10)
+
+en_yuksek_puan_ulke
+
+```
+
+Bu tablodaki verilere göre, kırmızı liste indeksi en yüksek olan ülkeler İsveç, Kıbrıs, Finlandiya ve Tacikistan'dır. Bu ülkelerdeki tür gruplarının toplu yok olma riski daha yüksektir.
+
+Öte yandan, kırmızı liste indeksi en düşük olan ülkeler Kongo'dur. Bu durumda, Kongo'daki tür grupları genelinde toplu yok olma riski daha düşüktür.
+
+Bu bilgiler, uluslararası doğa koruma çabaları ve türlerin korunması için önemli bir referans noktası olabilir. Bu ülkelerdeki çevresel politikalar ve koruma çalışmaları, endemik ve tehdit altındaki türlerin korunması için öncelikli alanlara odaklanabilir.
+
+```{r, echo=FALSE}
+
+library(ggplot2)
+
+grafik <- cevre %>% 
+  ggplot(aes(x = solar_fotovoltaik, y = yenilenebilir_enerji, color = solar_fotovoltaik)) +
+  geom_point() +
+  labs(x = "Solar Fotovoltaik",
+       y = "Yenilenebilir Enerji",
+       color = "Solar Fotovoltaik") +
+  theme_minimal()
+
+grafik
+
+```
+
+Bu grafiğe göre, solar fotovoltaik elektrik kapasitesi ile yenilenebilir enerji arasında bir ilişki olduğu görülmektedir. Grafikte, solar fotovoltaik elektrik kapasitesi arttıkça, yenilenebilir enerji tüketimi de artmaktadır.
+
+Bu durum, solar fotovoltaik sistemlerin yaygınlaşmasıyla birlikte yenilenebilir enerji üretiminin arttığını göstermektedir. Solar fotovoltaik enerji, güneş ışığından elektrik enerjisi üretme yöntemidir ve temiz bir enerji kaynağı olarak kabul edilmektedir. Bu grafiğin gösterdiği artış eğilimi, güneş enerjisine dayalı elektrik üretiminin çevresel sürdürülebilirlik açısından önemli bir rol oynayabileceğini göstermektedir.
+
+```{r, echo=FALSE}
+ggplot(data = cevre, aes(x = karasal_korunan_alanlar, y = kirmizi_liste_indeksi)) +
+  geom_point() +
+  labs(x = "Karasal Korunan Alanlar ", y = "Kırmızı Liste İndeksi") +
+  theme_minimal()
+```
+
+Bu grafiğin, karasal korunan alanlar ile kırmızı liste indeksi arasındaki ilişkiyi gösterdiği söylenebilir. Grafiğe baktığımızda, karasal korunan alanların artmasıyla kırmızı liste indeksinin de arttığı bir eğilim gözlenmektedir. Bu durum, karasal korunan alanların biyolojik çeşitlilik ve ekosistem sağlığı üzerinde olumlu etkileri olduğunu göstermektedir. Yani, daha fazla korunan alanın olduğu bölgelerde nadir türlerin varlığı ve doğal yaşamın sürdürülebilirliği daha yüksek olabilir. Ancak, bazı noktalarda düşük karasal korunan alanlara rağmen yüksek kırmızı liste indeksi değerleri de dikkat çekmektedir. Bu noktalar, diğer faktörlerin (örneğin habitat kaybı, iklim değişikliği, kara kullanımı vb.) kırmızı liste indeksi üzerinde etkili olabileceğini düşündürmektedir.
+
+
+* H0 (Null Hypothesis): İki grubun ortalaması arasında anlamlı bir fark yoktur.
+* Ha (Alternative Hypothesis): İki grubun ortalaması arasında anlamlı bir fark vardır
+
+
+```{r, echo=FALSE}
+
+t.test(cevre$birim_gsyih, cevre$kirmizi_liste_indeksi)
+```
+
+T-testi sonucuna göre, p-değeri çok küçük (<2.2e-16) olduğundan, H0 hipotezi reddedilir ve iki grup arasında birim GSYİH ve kırmızı liste indeksi arasında anlamlı bir fark olduğu sonucuna varılır. Ayrıca, 95% güven aralığına göre, iki grubun ortalamaları arasındaki fark -0.7256833 ile -0.6435537 arasındadır.
+
+Bu sonuçlar, birim GSYİH ve kırmızı liste indeksi arasındaki ilişkinin istatistiksel olarak anlamlı olduğunu göstermektedir. Yani, birim GSYİH değeri yükseldikçe kırmızı liste indeksi düşmektedir. Bu analiz, ekonomik aktivitelerin biyolojik çeşitlilik üzerindeki etkisini göstermektedir.
+
+```{r, echo=FALSE}
+library(ggplot2)
+
+ggplot(data = cevre) +
+  geom_col(aes(x = komur, y = kisi_basina_karbondioksit, fill = ulke), width = 0.20) +
+  labs(x = "Kömür", y = "Kişi Başına Karbondioksit", fill = "Ülke") +
+  ggtitle("Kömür ve Kişi Başına Karbondioksit İlişkisi") +
+  theme_minimal() +
+  theme(legend.position = "right")
+
+```
+
+Bu grafik, ülkelerin kömür tüketimi ile kişi başına karbondioksit emisyonu arasındaki ilişkiyi göstermektedir. Her bir sütun, bir ülkeyi temsil etmektedir ve sütunların yüksekliği, o ülkede kömür tüketimi ile kişi başına karbondioksit emisyonu arasındaki ilişkiyi göstermektedir.
+
+Grafiğe baktığımızda, bazı ülkelerin yüksek kömür tüketimi ve buna bağlı olarak yüksek karbondioksit emisyonu olduğunu görebiliriz. Diğer yandan, bazı ülkelerde ise kömür tüketimi düşük olduğu halde karbondioksit emisyonu hala yüksek olabilir. Bu durum, enerji kaynaklarının çeşitliliği, enerji verimliliği politikaları ve yenilenebilir enerji kullanımının farklılığı gibi faktörlerden kaynaklanabilir.
+
+Grafik, kömür tüketimi ile karbondioksit emisyonu arasındaki farklılıkları ve bu farklılıkların ülkeler arasındaki değişimi görselleştirerek, çevresel sürdürülebilirlik açısından farkındalık yaratmaya yardımcı olabilir. 
+
+```{r, echo=FALSE}
+
+library(maps)
+library(ggplot2)
+
+harita <- map_data("world")
+
+veri <- data.frame(
+  ulke = c("İsveç", "Kıbrıs", "Finlandiya", "Tacikistan", "Lüksemburg", "Belçika", "Almanya", "Danimarka", "İsviçre", "Kongo"),
+  lat = c(62, 35, 64, 39, 49, 51, 51, 56, 47, -1),
+  long = c(18, 33, 26, 71, 6, 4, 10, 10, 8, 15)
+)
+
+ggplot() +
+  geom_polygon(data = harita, aes(x = long, y = lat, group = group), fill = "lightgray", color = "white") +
+  geom_point(data = veri, aes(x = long, y = lat), color = "orange", size = 3) +
+  labs(x = "Longitude", y = "Latitude", title = "Kırmızı Liste İndeksi En Yüksek Olan Ülkeler") +
+  theme_void()
+
+```
+
+Bu grafik, "Kırmızı Liste İndeksi" en yüksek olan ülkelerin dünya haritası üzerinde turuncu noktalarla gösterilmesini sağlar. İsveç, Kıbrıs, Finlandiya, Tacikistan, Lüksemburg, Belçika, Almanya, Danimarka, İsviçre ve Kongo gibi ülkelerin konumları belirtilmiştir.
+
+```{r, echo=FALSE}
+
+library(ggplot2)
+
+ggplot(cevre, aes(x = ulke, y = fosfor, fill = azot)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Ülke", y = "Fosfor", fill = "Azot") +
+  ggtitle("Fosfor ve Azot Değişkenlerinin Ülkelere 
+      Göre Karşılaştırması") +
+  theme_minimal()
+```
+
+Bu grafik, fosfor ve azot değişkenlerinin farklı ülkeler arasındaki karşılaştırmasını görselleştiriyor. Her ülkenin fosfor değeri sütun yüksekliğiyle temsil ediliyor ve sütunların dolgusu azot değerini gösteriyor. Görsel olarak bu şekilde, ülkeler arasındaki fosfor ve azot düzeylerini karşılaştırmak kolaylaşıyor.
+
+Grafiği incelediğimizde, Kıbrıs ve Tacikistan ülkelerinin yüksek fosfor değerlerine sahip olduğunu görüyoruz. Azot değerlerine baktığımızda ise Tacikistan'ın diğer ülkelere göre daha yüksek bir değere sahip olduğunu gözlemliyoruz.
+
+Bu grafik, fosfor ve azotun farklı ülkelerdeki dağılımını ve bu iki değişken arasındaki ilişkiyi anlamamıza yardımcı oluyor. Ayrıca, sütunların dolgusuyla azotun fosfor üzerindeki etkisini görebiliyoruz.
+
+```{r, echo=FALSE}
+library(ggplot2)
+
+ggplot(cevre, aes(x = kisi_basi_yerli_malzeme, y = kisi_basi_yerli_malzeme_ton, group = 1)) +
+  geom_line(color = "blue", size = 1) +
+  labs(x = "Kişi Başına Yerli Malzeme", y = "Kişi Başına Yerli Malzeme (Ton)", title = "Kişi Başına Yerli Malzeme Tüketimi") +
+  theme_minimal()
+
+```
+"Kişi Başına Yerli Malzeme Tüketimi"ni temsil eden "Kişi Başına Yerli Malzeme" ve "Kişi Başına Yerli Malzeme (Ton)" değişkenlerini kullanarak oluşturduk. Grafikte, yatay eksende kişi başına yerli malzeme değerleri, dikey eksende ise kişi başına yerli malzeme tüketimi (ton) değerleri yer alıyor. Grafikteki çizgi, kişi başına yerli malzeme tüketiminin zaman içindeki değişimini gösteriyor. Çizginin yönü ve eğimi, tüketimin artış veya azalışını gösteriyor. Bu grafik sayesinde kişi başına yerli malzeme tüketiminin zamanla nasıl değiştiğini analiz edebiliriz. 
+
+```{r, echo=FALSE}
+library(ggplot2)
+
+top_20_ulke <- cevre %>% 
+  top_n(20, komur)
+
+ggplot(top_20_ulke, aes(x = ulke, y = komur, fill = ulke)) +
+  geom_boxplot(color = "black") +
+  labs(x = "Ülke", y = "Kömür Tüketimi", fill = "Ülke") +
+  ggtitle("İlk 20 Ülkeye Göre Kömür Tüketimi") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+Bu grafik, ilk 20 ülkenin kömür tüketimini kutu grafiği olarak göstermektedir. Her bir kutu, bir ülkeyi temsil etmektedir ve kutunun yüksekliği, kömür tüketiminin dağılımını göstermektedir. Renklendirme sayesinde, her bir ülkenin kendine özgü bir renkle gösterilmesi sağlanmıştır, böylece ülkeler arasındaki farkları daha kolay gözlemleyebiliriz.
+
+Grafik üzerindeki kutuların yükseklikleri, kömür tüketiminin medyanını ve yayılımını göstermektedir. Kutunun üst ve alt sınırları, verilerin çeyrekliklerini ifade ederken, çizgiler (bıyıklar) ise verilerin dağılımını temsil etmektedir. Bu şekilde, ülkelerin kömür tüketimindeki farklılıkları ve dağılımları hakkında bilgi edinebiliriz.
+
+
+```{r, echo=FALSE}
+library(ggplot2)
+
+en_cok_olanlar <- cevre %>%
+  top_n(10, kisi_basi_yerli_malzeme)
+
+pasta_grafiği <- ggplot(en_cok_olanlar, aes(x = "", fill = ulke)) +
+  geom_bar(width = 1) +
+  coord_polar("y", start = 0) +
+  labs(fill = "Ülke") +
+  theme_void()
+
+pasta_grafiği
+
+```
+
+Bu pasta grafiği, kisi basi yerli malzeme değeri en yüksek olan ilk 10 ülkeyi görsel olarak temsil ediyor. Grafikteki pasta dilimlerinin büyüklüğü, her bir ülkenin kisi basi yerli malzeme değerinin oranını gösteriyor. Pasta dilimlerinin renkleri, her bir ülkeyi ayırt etmek için kullanılıyor ve her ülkenin kendine özgü bir renkle temsil ediliyor.
+
+Grafiği incelediğimizde, en çok olan ilk 10 ülkenin kisi basi yerli malzeme değerleri arasında önemli farklılıklar olduğunu görüyoruz. Bazı ülkeler daha yüksek bir kisi_basi_yerli_malzeme değerine sahipken, diğerleri daha düşük bir değere sahiptir. Bu, ülkeler arasında kaynak kullanımı ve sürdürülebilirlik konusunda farklı yaklaşımlar olduğunu gösteriyor.
+
+Bu grafik, kisi basi yerli malzeme değerlerinin görsel bir özetini sunarak, kaynak kullanımı ve sürdürülebilirlik konularında kararlar alırken önemli bilgiler sağlayabilir. Ayrıca, en çok olan ilk 10 ülkenin hangi ülkeler olduğunu ve kisi basi yerli malzeme değerlerindeki farkları hızlı bir şekilde gözlemlememizi sağlar.
+
+
+```{r, echo=FALSE}
+library(dplyr)
+library(ggplot2)
+
+top_10_countries <- cevre %>%
+  arrange(desc(solar_fotovoltaik)) %>%
+  top_n(10)
+
+ggplot(top_10_countries, aes(x = reorder(ulke, solar_fotovoltaik), y = solar_fotovoltaik, fill = ulke)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Ülke", y = "Solar Fotovoltaik") +
+  coord_flip() +
+  theme_minimal()
+
+```
+
+```{r, echo=FALSE}
+top_10_countries <- cevre %>%
+  arrange(desc(tatli_su_cekimleri)) %>%
+  top_n(10)
+
+ggplot(top_10_countries, aes(x = reorder(ulke, tatli_su_cekimleri), y = tatli_su_cekimleri, fill = ulke)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Ülke", y = "Tatlı Su Çekimleri") +
+  coord_flip() +
+  theme_minimal()
+
+```
+
+```{r, echo=FALSE}
+top_10_countries <- cevre %>%
+  arrange(desc(yenilenebilir_enerji)) %>%
+  top_n(10)
+
+ggplot(top_10_countries, aes(x = reorder(ulke, yenilenebilir_enerji), y = yenilenebilir_enerji, fill = ulke)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Ülke", y = "Yenilenebilir Enerji") +
+  coord_flip() +
+  theme_minimal()
+
+```
+
+Solar Fotovoltaik Grafiği Yorumu:
+Solar fotovoltaik grafiği, solar fotovoltaik kapasitesi en yüksek olan ilk 10 ülkeyi göstermektedir. Grafiğe göre, Almanya, Çin ve Japonya en yüksek solar fotovoltaik kapasitesine sahip ülkelerdir. Diğer ülkeler ise daha düşük kapasitelerle gelmektedir. Solar fotovoltaik enerji üretimi, güneş enerjisinden elektrik üretme yöntemidir ve bu grafik, ülkelerin bu alanda ne kadar ilerlediğini göstermektedir. Almanya, Çin ve Japonya gibi ülkeler, yenilenebilir enerjiye yatırım yapmada öncü konumdadır.
+
+Tatlı Su Çekimi Grafiği Yorumu:
+Tatlı su çekimi grafiği, tatlı su kaynaklarını en çok kullanan ilk 10 ülkeyi göstermektedir. Grafikten görüldüğü üzere, ABD, Hindistan ve Çin en fazla tatlı su çeken ülkelerdir. Bu ülkelerde yoğun nüfus, tarımsal faaliyetler ve endüstriyel kullanım tatlı su tüketimini artırmaktadır. Tatlı su kaynaklarının sürdürülebilir yönetimi ve korunması önemlidir, bu grafik bu konuda hangi ülkelerin öne çıktığını göstermektedir.
+
+Yenilenebilir Enerji Grafiği Yorumu:
+Yenilenebilir enerji grafiği, yenilenebilir enerji kaynaklarını en fazla kullanan ilk 10 ülkeyi göstermektedir. Grafikten görüldüğü üzere, Çin, ABD ve Brezilya yenilenebilir enerji kaynaklarını en yüksek oranda kullanmaktadır. Bu ülkeler, güneş enerjisi, rüzgar enerjisi, hidroelektrik gibi yenilenebilir enerji kaynaklarına büyük yatırımlar yapmaktadır. Yenilenebilir enerji, fosil yakıtlara olan bağımlılığı azaltarak çevresel sürdürülebilirlik için önemli bir rol oynamaktadır. Bu grafik, ülkelerin yenilenebilir enerji kullanımındaki performansını görselleştirerek karşılaştırmamıza yardımcı olur.
+
+
+## Sonuç
+
+Çevre veri seti üzerinde yapılan analizler, çevresel sürdürülebilirlik kavramını anlamak ve çevresel faktörlerin etkisini değerlendirmek amacıyla gerçekleştirilmiştir. Analizlerde kullanılan değişkenler arasında kömür tüketimi, karbondioksit emisyonları, yenilenebilir enerji tüketimi, solar fotovoltaik kapasite, tatlı su çekimi, gübre kullanımı, yerli malzeme tüketimi, afetlere atfedilen ölüm ve kayıp kişilerin sayısı, karasal korunan alanlar ve kırmızı liste indeksi yer almaktadır.
+
+İlk olarak, kömür tüketimi ile kişi başına karbondioksit emisyonları arasındaki ilişkiyi inceledik. Grafikten görüldüğü üzere, kömür tüketimi arttıkça kişi başına karbondioksit emisyonları da artmaktadır. Bu durum, kömürün fosil yakıt olarak kullanılmasının çevresel etkilerini vurgulamaktadır.
+
+Ardından, birim GSYİH başına karbondioksit emisyonları ile yenilenebilir enerji tüketimi arasındaki ilişkiyi değerlendirdik. Grafikten, birim GSYİH başına karbondioksit emisyonlarının azalırken yenilenebilir enerji tüketiminin arttığını görmekteyiz. Bu durum, ekonomik büyüme ile çevresel etkiler arasında olumlu bir ilişki kurulabileceğini göstermektedir.
+
+Solar fotovoltaik kapasite ile yenilenebilir enerji tüketimi arasındaki ilişkiyi de analiz ettik. Görsel olarak, solar fotovoltaik kapasitesi yüksek olan ülkelerin genellikle yenilenebilir enerji tüketiminin de yüksek olduğunu görüyoruz. Bu da solar enerjinin önemli bir yenilenebilir enerji kaynağı olduğunu ve ülkelerin bu alanda yapılan yatırımların artmasının önemli olduğunu göstermektedir.
+
+Tatlı su çekimi ile gübre kullanımı arasındaki ilişkiyi değerlendirdik. Grafikten, gübre kullanımının artmasıyla tatlı su çekiminin de arttığını gözlemlemekteyiz. Bu durum, tarımsal faaliyetlerin tatlı su kaynakları üzerindeki etkisini göstermektedir.
+
+Son olarak, karasal korunan alanlar ile kırmızı liste indeksi arasındaki ilişkiyi inceledik. Grafikten, karasal korunan alanlardaki artışın kırmızı liste indeksindeki tür sayısının azalmasıyla ilişkili olduğunu gözlemlemekteyiz. Bu durum, korunan alanların biyoçeşitlilik ve türlerin korunması açısından önemli olduğunu ve koruma çabalarının türlerin yok olma riskini azaltmada etkili olduğunu göstermektedir.
+
+Analizlerin sonuçlarına göre, çevresel sürdürülebilirlik için bazı önerilerde bulunabiliriz. Öncelikle, kömür gibi fosil yakıtların kullanımını azaltmak ve yenilenebilir enerji kaynaklarına yönelmek önemlidir. Bu sayede karbondioksit emisyonları kontrol altına alınabilir. Ayrıca, tarımsal faaliyetlerde gübre kullanımının daha sürdürülebilir hale getirilmesi ve su kaynaklarının etkin bir şekilde yönetilmesi gerekmektedir.
+
+Korunan alanların genişletilmesi ve biyoçeşitliliğin korunması da çevresel sürdürülebilirlik açısından önemlidir. Doğal habitatların korunması, türlerin yok olma riskini azaltacak ve ekosistemlerin dengesini sağlayacaktır.
+
+Sonuç olarak, çevresel sürdürülebilirlik için enerji, su ve tarım gibi sektörlerde dikkatli politikaların ve uygulamaların benimsenmesi gerekmektedir. Kaynakların etkin kullanımı, çevresel etkilerin azaltılması ve doğal kaynakların korunması gelecek nesillere yaşanabilir bir dünya bırakmak için önemlidir.
+
+Bu analiz, çevresel sürdürülebilirlik konusunda genel bir anlayış sağlamaktadır. Ancak, analizi daha da geliştirmek için aşağıdaki adımlar düşünülebilir:
+
+Daha fazla veri: Analizi daha sağlam hale getirmek için daha fazla ülke ve daha fazla değişken içeren genişletilmiş bir veri seti kullanılabilir.
+
+İstatistiksel testler: Değişkenler arasındaki ilişkileri daha ayrıntılı bir şekilde değerlendirmek için istatistiksel testler uygulanabilir. Korelasyon analizi, regresyon analizi veya anova gibi yöntemler kullanılabilir.
+
+Nedensellik analizi: Analizde sadece ilişkileri değil, aynı zamanda nedensel ilişkileri de araştırmak önemlidir. Nedensel ilişkileri belirlemek için kapsamlı bir kausalite analizi yapılabilir.
+
+Zaman serisi analizi: Değişkenlerin zaman içindeki değişimlerini analiz etmek, çevresel sürdürülebilirlik eğilimlerini anlamak için faydalı olabilir. Zaman serisi analizi kullanılarak gelecekteki trendler ve öngörüler belirlenebilir.
+
+Bu geliştirmelerle birlikte, çevresel sürdürülebilirlik üzerindeki faktörlerin etkisini daha iyi anlayabilir ve daha doğru stratejiler geliştirebiliriz.
+\newpage
+
+# Kaynakça {#references}
+<div id="refs"></div>
+
